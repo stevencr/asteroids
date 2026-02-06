@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asteroids</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="welcomeScreen">
+      <h1 class="glitch" data-text="ASTEROIDS">ASTEROIDS</h1>
+      <p class="subtitle">Press SPACE or TAP to start</p>
+
+      <div class="game-guide">
+        <div class="guide-item">
+          <canvas
+            class="guide-canvas"
+            id="guidePlayer"
+            width="60"
+            height="60"
+          ></canvas>
+          <div class="guide-text">
+            <strong>Your Ship</strong>
+            <span>Arrow keys to move, SPACE to shoot</span>
+          </div>
+        </div>
+
+        <div class="guide-item">
+          <canvas
+            class="guide-canvas"
+            id="guideAsteroid"
+            width="60"
+            height="60"
+          ></canvas>
+          <div class="guide-text">
+            <strong>Asteroids</strong>
+            <span>Destroy them to score points</span>
+          </div>
+        </div>
+
+        <div class="guide-item">
+          <canvas
+            class="guide-canvas"
+            id="guideUFO"
+            width="60"
+            height="60"
+          ></canvas>
+          <div class="guide-text">
+            <strong>UFO</strong>
+            <span>Worth 300 points, shoots back!</span>
+          </div>
+        </div>
+
+        <div class="guide-item">
+          <canvas
+            class="guide-canvas"
+            id="guideShield"
+            width="60"
+            height="60"
+          ></canvas>
+          <div class="guide-text">
+            <strong>Shield</strong>
+            <span>Temporary invulnerability</span>
+          </div>
+        </div>
+
+        <div class="guide-item">
+          <canvas
+            class="guide-canvas"
+            id="guideRapidFire"
+            width="60"
+            height="60"
+          ></canvas>
+          <div class="guide-text">
+            <strong>Rapid Fire</strong>
+            <span>Faster shooting speed</span>
+          </div>
+        </div>
+
+        <div class="guide-item">
+          <canvas
+            class="guide-canvas"
+            id="guideTripleShot"
+            width="60"
+            height="60"
+          ></canvas>
+          <div class="guide-text">
+            <strong>Triple Shot</strong>
+            <span>Fires three bullets at once</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="copyright">By Steven Cranfield &copy; 2026</p>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Enhanced HUD -->
+    <div id="hud">
+      <div class="hud-panel hud-top-left">
+        <div class="hud-label">SCORE</div>
+        <div id="score" class="hud-value">0</div>
+        <div class="hud-label hud-small">HIGH</div>
+        <div id="highScore" class="hud-value hud-small-value">0</div>
+      </div>
+
+      <div class="hud-panel hud-top-right">
+        <div class="hud-label">LEVEL</div>
+        <div id="level" class="hud-value">1</div>
+      </div>
+
+      <div class="hud-panel hud-bottom-left">
+        <div class="hud-label">LIVES</div>
+        <div id="lives" class="lives-container">
+          <span class="life-icon">▲</span>
+          <span class="life-icon">▲</span>
+          <span class="life-icon">▲</span>
+        </div>
+      </div>
+
+      <div class="hud-panel hud-bottom-right">
+        <div id="active-effects-container"></div>
+      </div>
+    </div>
+
+    <div id="controls">
+      <div class="touch-button" id="leftBtn">←</div>
+      <div class="touch-button" id="thrustBtn">↑</div>
+      <div class="touch-button" id="rightBtn">→</div>
+      <div class="touch-button" id="shootBtn">•</div>
+    </div>
+
+    <script type="module">
+      import { Game } from "./game.js";
+
+      // Initialize game when the window is fully loaded
+      window.addEventListener("load", () => {
+        console.log("Window loaded, starting game...");
+        new Game();
+      });
+    </script>
+  </body>
+</html>

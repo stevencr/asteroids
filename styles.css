@@ -1,0 +1,642 @@
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+  font-family: "Courier New", monospace;
+  color: #fff;
+  overflow: hidden;
+}
+
+canvas {
+  display: block;
+  margin: 0 auto;
+  background: #000;
+}
+
+/* HUD Styles */
+#hud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 100;
+  display: none;
+}
+
+.hud-panel {
+  position: absolute;
+  background: rgba(0, 20, 40, 0.8);
+  border: 2px solid #0ff;
+  border-radius: 4px;
+  padding: 12px 16px;
+  font-family: "Courier New", monospace;
+  box-shadow:
+    0 0 10px rgba(0, 255, 255, 0.3),
+    inset 0 0 10px rgba(0, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+}
+
+.hud-top-left {
+  top: 20px;
+  left: 20px;
+  min-width: 140px;
+}
+
+.hud-top-right {
+  top: 20px;
+  right: 20px;
+  min-width: 100px;
+}
+
+.hud-bottom-left {
+  bottom: 80px;
+  left: 20px;
+}
+
+.hud-bottom-right {
+  bottom: 20px;
+  right: 20px;
+  min-width: 160px;
+}
+
+.hud-label {
+  color: #0ff;
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+}
+
+.hud-label.hud-small {
+  font-size: 10px;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.hud-value {
+  color: #fff;
+  font-size: 28px;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+  letter-spacing: 1px;
+}
+
+.hud-small-value {
+  font-size: 18px;
+}
+
+.lives-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.life-icon {
+  color: #0f0;
+  font-size: 20px;
+  text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+  display: inline-block;
+  transform: rotate(0deg);
+}
+
+.life-icon.lost {
+  color: #333;
+  text-shadow: none;
+  opacity: 0.3;
+}
+
+#active-effects-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.active-effect {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.effect-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.effect-icon {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.effect-label {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  font-family: "Courier New", monospace;
+}
+
+.effect-progress-container {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.effect-progress {
+  height: 100%;
+  transition: width 0.3s ease-out;
+  border-radius: 3px;
+  position: relative;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.effect-progress::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), transparent);
+  border-radius: 3px 3px 0 0;
+}
+
+.shield-icon {
+  color: #0ff;
+  font-size: 18px;
+  margin-right: 6px;
+  animation: rotate-shield 2s infinite linear;
+}
+
+@keyframes pulse-shield {
+  0% {
+    box-shadow:
+      0 0 20px rgba(0, 255, 255, 0.6),
+      inset 0 0 10px rgba(0, 255, 255, 0.2);
+  }
+  100% {
+    box-shadow:
+      0 0 30px rgba(0, 255, 255, 0.9),
+      inset 0 0 15px rgba(0, 255, 255, 0.4);
+  }
+}
+
+@keyframes rotate-shield {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .hud-panel {
+    padding: 8px 12px;
+  }
+
+  .hud-top-left {
+    top: 10px;
+    left: 10px;
+    min-width: 100px;
+  }
+
+  .hud-top-right {
+    top: 10px;
+    right: 10px;
+    min-width: 80px;
+  }
+
+  .hud-bottom-left {
+    bottom: 100px;
+    left: 10px;
+  }
+
+  .hud-bottom-right {
+    bottom: 80px;
+    right: 10px;
+    min-width: 140px;
+  }
+
+  .hud-label {
+    font-size: 10px;
+  }
+
+  .hud-value {
+    font-size: 20px;
+  }
+
+  .hud-small-value {
+    font-size: 14px;
+  }
+
+  .life-icon {
+    font-size: 16px;
+  }
+
+  #invulnerable-indicator {
+    font-size: 12px;
+    padding: 6px 16px;
+  }
+}
+
+/* Legacy score/level elements (hidden, kept for compatibility) */
+#score,
+#level {
+  display: block;
+}
+
+#controls {
+  position: fixed;
+  bottom: 20px;
+  display: none;
+  gap: 20px;
+  touch-action: none;
+}
+
+.touch-button {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  font-size: 24px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+@media (max-width: 768px) {
+  .touch-button {
+    display: flex;
+  }
+}
+
+/* Welcome Screen */
+#welcomeScreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.5s ease-out;
+}
+
+#welcomeScreen.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.glitch {
+  font-family: "Courier New", monospace;
+  font-size: 72px;
+  font-weight: bold;
+  color: #fff;
+  position: relative;
+  margin: 0;
+  animation: glitch-skew 1s infinite linear alternate-reverse;
+}
+
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.glitch::before {
+  left: 2px;
+  text-shadow: -2px 0 #ff00c1;
+  clip: rect(44px, 450px, 56px, 0);
+  animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+  left: -2px;
+  text-shadow:
+    -2px 0 #00fff9,
+    2px 2px #ff00c1;
+  animation: glitch-anim2 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+  0% {
+    clip: rect(51px, 9999px, 28px, 0);
+    transform: skew(0.42deg);
+  }
+  5% {
+    clip: rect(94px, 9999px, 71px, 0);
+    transform: skew(0.88deg);
+  }
+  10% {
+    clip: rect(16px, 9999px, 99px, 0);
+    transform: skew(0.25deg);
+  }
+  15% {
+    clip: rect(85px, 9999px, 12px, 0);
+    transform: skew(0.76deg);
+  }
+  20% {
+    clip: rect(39px, 9999px, 63px, 0);
+    transform: skew(0.33deg);
+  }
+  25% {
+    clip: rect(77px, 9999px, 5px, 0);
+    transform: skew(0.92deg);
+  }
+  30% {
+    clip: rect(23px, 9999px, 88px, 0);
+    transform: skew(0.15deg);
+  }
+  35% {
+    clip: rect(61px, 9999px, 41px, 0);
+    transform: skew(0.68deg);
+  }
+  40% {
+    clip: rect(8px, 9999px, 76px, 0);
+    transform: skew(0.51deg);
+  }
+  45% {
+    clip: rect(92px, 9999px, 19px, 0);
+    transform: skew(0.29deg);
+  }
+  50% {
+    clip: rect(34px, 9999px, 54px, 0);
+    transform: skew(0.83deg);
+  }
+  55% {
+    clip: rect(68px, 9999px, 2px, 0);
+    transform: skew(0.45deg);
+  }
+  60% {
+    clip: rect(11px, 9999px, 97px, 0);
+    transform: skew(0.72deg);
+  }
+  65% {
+    clip: rect(86px, 9999px, 24px, 0);
+    transform: skew(0.38deg);
+  }
+  70% {
+    clip: rect(47px, 9999px, 66px, 0);
+    transform: skew(0.91deg);
+  }
+  75% {
+    clip: rect(71px, 9999px, 35px, 0);
+    transform: skew(0.22deg);
+  }
+  80% {
+    clip: rect(3px, 9999px, 81px, 0);
+    transform: skew(0.64deg);
+  }
+  85% {
+    clip: rect(58px, 9999px, 13px, 0);
+    transform: skew(0.47deg);
+  }
+  90% {
+    clip: rect(29px, 9999px, 95px, 0);
+    transform: skew(0.85deg);
+  }
+  95% {
+    clip: rect(82px, 9999px, 7px, 0);
+    transform: skew(0.58deg);
+  }
+  100% {
+    clip: rect(42px, 9999px, 69px, 0);
+    transform: skew(0.31deg);
+  }
+}
+
+@keyframes glitch-anim2 {
+  0% {
+    clip: rect(61px, 9999px, 90px, 0);
+    transform: skew(0.53deg);
+  }
+  5% {
+    clip: rect(33px, 9999px, 17px, 0);
+    transform: skew(0.81deg);
+  }
+  10% {
+    clip: rect(74px, 9999px, 48px, 0);
+    transform: skew(0.27deg);
+  }
+  15% {
+    clip: rect(9px, 9999px, 83px, 0);
+    transform: skew(0.69deg);
+  }
+  20% {
+    clip: rect(52px, 9999px, 21px, 0);
+    transform: skew(0.44deg);
+  }
+  25% {
+    clip: rect(88px, 9999px, 56px, 0);
+    transform: skew(0.95deg);
+  }
+  30% {
+    clip: rect(19px, 9999px, 72px, 0);
+    transform: skew(0.36deg);
+  }
+  35% {
+    clip: rect(67px, 9999px, 4px, 0);
+    transform: skew(0.78deg);
+  }
+  40% {
+    clip: rect(25px, 9999px, 93px, 0);
+    transform: skew(0.21deg);
+  }
+  45% {
+    clip: rect(80px, 9999px, 38px, 0);
+    transform: skew(0.66deg);
+  }
+  50% {
+    clip: rect(14px, 9999px, 65px, 0);
+    transform: skew(0.49deg);
+  }
+  55% {
+    clip: rect(76px, 9999px, 27px, 0);
+    transform: skew(0.87deg);
+  }
+  60% {
+    clip: rect(41px, 9999px, 59px, 0);
+    transform: skew(0.32deg);
+  }
+  65% {
+    clip: rect(6px, 9999px, 96px, 0);
+    transform: skew(0.74deg);
+  }
+  70% {
+    clip: rect(54px, 9999px, 11px, 0);
+    transform: skew(0.41deg);
+  }
+  75% {
+    clip: rect(89px, 9999px, 70px, 0);
+    transform: skew(0.93deg);
+  }
+  80% {
+    clip: rect(22px, 9999px, 45px, 0);
+    transform: skew(0.28deg);
+  }
+  85% {
+    clip: rect(63px, 9999px, 1px, 0);
+    transform: skew(0.62deg);
+  }
+  90% {
+    clip: rect(37px, 9999px, 84px, 0);
+    transform: skew(0.55deg);
+  }
+  95% {
+    clip: rect(98px, 9999px, 16px, 0);
+    transform: skew(0.73deg);
+  }
+  100% {
+    clip: rect(49px, 9999px, 78px, 0);
+    transform: skew(0.39deg);
+  }
+}
+
+@keyframes glitch-skew {
+  0% {
+    transform: skew(0deg);
+  }
+  10% {
+    transform: skew(-1deg);
+  }
+  20% {
+    transform: skew(2deg);
+  }
+  30% {
+    transform: skew(-2deg);
+  }
+  40% {
+    transform: skew(1deg);
+  }
+  50% {
+    transform: skew(-1deg);
+  }
+  60% {
+    transform: skew(2deg);
+  }
+  70% {
+    transform: skew(0deg);
+  }
+  80% {
+    transform: skew(-1deg);
+  }
+  90% {
+    transform: skew(1deg);
+  }
+  100% {
+    transform: skew(0deg);
+  }
+}
+
+.subtitle {
+  font-family: "Courier New", monospace;
+  font-size: 24px;
+  color: #0f0;
+  margin-top: 30px;
+  animation: blink 1.5s infinite;
+}
+
+.game-guide {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 40px;
+  max-width: 550px;
+  padding: 0 20px;
+}
+
+.guide-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(0, 40, 80, 0.3);
+  border: 1px solid rgba(0, 255, 255, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.guide-canvas {
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(0, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+.guide-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: left;
+}
+
+.guide-text strong {
+  color: #0ff;
+  font-size: 14px;
+  font-family: "Courier New", monospace;
+}
+
+.guide-text span {
+  color: #aaa;
+  font-size: 11px;
+  font-family: "Courier New", monospace;
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0.3;
+  }
+}
+
+.copyright {
+  font-family: "Courier New", monospace;
+  font-size: 14px;
+  color: #666;
+  position: absolute;
+  bottom: 30px;
+}
+
+@media (max-width: 768px) {
+  .glitch {
+    font-size: 48px;
+  }
+
+  .subtitle {
+    font-size: 18px;
+  }
+
+  .game-guide {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+  }
+
+  .guide-text strong {
+    font-size: 12px;
+  }
+
+  .guide-text span {
+    font-size: 10px;
+  }
+}
