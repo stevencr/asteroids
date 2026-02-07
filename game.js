@@ -107,7 +107,7 @@ export class Game {
   saveHighScore(name) {
     const data = {
       score: this.highScore,
-      name: name || "---"
+      name: name || "---",
     };
     localStorage.setItem("asteroidsHighScore", JSON.stringify(data));
     this.highScoreHolder = data.name;
@@ -294,20 +294,20 @@ export class Game {
     const gameOverScreen = document.getElementById("gameOverScreen");
     const highScoreEntry = document.getElementById("highScoreEntry");
     const highScoreDisplay = document.getElementById("highScoreDisplay");
-    
+
     document.getElementById("finalScore").textContent = this.score;
     document.getElementById("finalLevel").textContent = this.level;
-    
+
     if (this.isNewHighScore) {
       highScoreEntry.classList.remove("hidden");
       highScoreDisplay.classList.add("hidden");
-      
+
       const playerNameInput = document.getElementById("playerName");
       const submitBtn = document.getElementById("submitScore");
-      
+
       playerNameInput.value = "";
       playerNameInput.focus();
-      
+
       const submitHandler = () => {
         const name = playerNameInput.value.trim() || "PLAYER";
         this.saveHighScore(name);
@@ -317,7 +317,7 @@ export class Game {
         document.getElementById("highScoreValue").textContent = this.highScore;
         this.syncHUD();
       };
-      
+
       submitBtn.onclick = submitHandler;
       playerNameInput.onkeydown = (e) => {
         if (e.key === "Enter") submitHandler();
@@ -325,10 +325,11 @@ export class Game {
     } else {
       highScoreEntry.classList.add("hidden");
       highScoreDisplay.classList.remove("hidden");
-      document.getElementById("highScoreHolder").textContent = this.highScoreHolder;
+      document.getElementById("highScoreHolder").textContent =
+        this.highScoreHolder;
       document.getElementById("highScoreValue").textContent = this.highScore;
     }
-    
+
     gameOverScreen.classList.remove("hidden");
   }
 
