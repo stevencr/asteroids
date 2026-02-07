@@ -86,7 +86,6 @@ export function createBullet(x, y, velocityX, velocityY) {
     collider: new Collider(settings.collision.bulletRadius),
     renderable: new Renderable("bullet"),
     lifetime: new Lifetime(settings.weapons.bulletLifetime),
-    screenWrap: new ScreenWrap(),
     tag: new Tag("bullet"),
   };
 }
