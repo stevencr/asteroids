@@ -33,9 +33,10 @@ export class Game {
     this.score = 0;
     this.level = 1;
     this.lives = settings.player.startingLives;
-    this.highScore = parseInt(localStorage.getItem("asteroidsHighScore")) || 0;
+    this.loadHighScore();
     this.gameOver = false;
     this.gameStarted = false;
+    this.isNewHighScore = false;
     this.shake = 0;
     this.ufoSpawnTimer = settings.enemies.ufoSpawnInterval;
     this.playerPowerUps = {
@@ -85,12 +86,40 @@ export class Game {
     this.canvas.height = window.innerHeight;
   }
 
+  loadHighScore() {
+    const savedData = localStorage.getItem("asteroidsHighScore");
+    if (savedData) {
+      try {
+        const data = JSON.parse(savedData);
+        this.highScore = data.score || 0;
+        this.highScoreHolder = data.name || "---";
+      } catch (e) {
+        // Legacy support for old numeric-only high score
+        this.highScore = parseInt(savedData) || 0;
+        this.highScoreHolder = "---";
+      }
+    } else {
+      this.highScore = 0;
+      this.highScoreHolder = "---";
+    }
+  }
+
+  saveHighScore(name) {
+    const data = {
+      score: this.highScore,
+      name: name || "---"
+    };
+    localStorage.setItem("asteroidsHighScore", JSON.stringify(data));
+    this.highScoreHolder = data.name;
+  }
+
   startGame() {
     if (this.gameStarted) return;
     this.gameStarted = true;
     this.input._startGameCallback = null;
 
     document.getElementById("welcomeScreen").classList.add("hidden");
+    document.getElementById("gameOverScreen").classList.add("hidden");
     this.hud.show();
     this.syncHUD();
   }
@@ -108,9 +137,11 @@ export class Game {
     this.level = 1;
     this.lives = settings.player.startingLives;
     this.gameOver = false;
+    this.isNewHighScore = false;
     this.playerPowerUps.rapidFire.remaining = 0;
     this.playerPowerUps.tripleShot.remaining = 0;
     this.input._restartGameCallback = null;
+    document.getElementById("gameOverScreen").classList.add("hidden");
     this.reset();
     this.syncHUD();
   }
@@ -122,11 +153,12 @@ export class Game {
   syncHUD() {
     if (this.score > this.highScore) {
       this.highScore = this.score;
-      localStorage.setItem("asteroidsHighScore", this.highScore);
+      this.isNewHighScore = true;
     }
     this.hud.update({
       score: this.score,
       highScore: this.highScore,
+      highScoreHolder: this.highScoreHolder,
       level: this.level,
       lives: this.lives,
       player: this.getPlayer(),
@@ -146,6 +178,7 @@ export class Game {
 
     if (this.lives <= 0) {
       this.gameOver = true;
+      this.showGameOver();
       this.input.onRestartGame(() => this.restart());
     } else {
       const centerX = this.canvas.width / 2;
@@ -255,6 +288,48 @@ export class Game {
 
   draw() {
     this.systems.render.render(this.entities, this.shake, this.gameOver);
+  }
+
+  showGameOver() {
+    const gameOverScreen = document.getElementById("gameOverScreen");
+    const highScoreEntry = document.getElementById("highScoreEntry");
+    const highScoreDisplay = document.getElementById("highScoreDisplay");
+    
+    document.getElementById("finalScore").textContent = this.score;
+    document.getElementById("finalLevel").textContent = this.level;
+    
+    if (this.isNewHighScore) {
+      highScoreEntry.classList.remove("hidden");
+      highScoreDisplay.classList.add("hidden");
+      
+      const playerNameInput = document.getElementById("playerName");
+      const submitBtn = document.getElementById("submitScore");
+      
+      playerNameInput.value = "";
+      playerNameInput.focus();
+      
+      const submitHandler = () => {
+        const name = playerNameInput.value.trim() || "PLAYER";
+        this.saveHighScore(name);
+        highScoreEntry.classList.add("hidden");
+        highScoreDisplay.classList.remove("hidden");
+        document.getElementById("highScoreHolder").textContent = name;
+        document.getElementById("highScoreValue").textContent = this.highScore;
+        this.syncHUD();
+      };
+      
+      submitBtn.onclick = submitHandler;
+      playerNameInput.onkeydown = (e) => {
+        if (e.key === "Enter") submitHandler();
+      };
+    } else {
+      highScoreEntry.classList.add("hidden");
+      highScoreDisplay.classList.remove("hidden");
+      document.getElementById("highScoreHolder").textContent = this.highScoreHolder;
+      document.getElementById("highScoreValue").textContent = this.highScore;
+    }
+    
+    gameOverScreen.classList.remove("hidden");
   }
 
   loop(time) {

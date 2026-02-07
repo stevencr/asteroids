@@ -9,6 +9,7 @@ export class HUDManager {
       controls: document.getElementById("controls"),
       score: document.getElementById("score"),
       highScore: document.getElementById("highScore"),
+      highScoreHolderName: document.getElementById("highScoreHolderName"),
       level: document.getElementById("level"),
       lives: document.getElementById("lives"),
       activeEffects: document.getElementById("active-effects-container"),
@@ -26,15 +27,18 @@ export class HUDManager {
   }
 
   update(gameState) {
-    this.updateScore(gameState.score, gameState.highScore);
+    this.updateScore(gameState.score, gameState.highScore, gameState.highScoreHolder);
     this.updateLevel(gameState.level);
     this.updateLives(gameState.lives);
     this.updateActiveEffects(gameState.player, gameState.playerPowerUps);
   }
 
-  updateScore(score, highScore) {
+  updateScore(score, highScore, highScoreHolder) {
     this.elements.score.textContent = score;
     this.elements.highScore.textContent = highScore;
+    if (this.elements.highScoreHolderName && highScoreHolder) {
+      this.elements.highScoreHolderName.textContent = highScoreHolder;
+    }
   }
 
   updateLevel(level) {

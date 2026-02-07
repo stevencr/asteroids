@@ -94,6 +94,49 @@
       <p class="copyright">By Steven Cranfield &copy; 2026</p>
     </div>
 
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="hidden">
+      <h1 class="glitch" data-text="GAME OVER">GAME OVER</h1>
+      
+      <div class="final-stats">
+        <div class="stat-row">
+          <span class="stat-label">FINAL SCORE:</span>
+          <span id="finalScore" class="stat-value">0</span>
+        </div>
+        <div class="stat-row">
+          <span class="stat-label">LEVEL REACHED:</span>
+          <span id="finalLevel" class="stat-value">1</span>
+        </div>
+      </div>
+
+      <div id="highScoreEntry" class="hidden">
+        <p class="new-high-score">🏆 NEW HIGH SCORE! 🏆</p>
+        <div class="name-input-container">
+          <label for="playerName">ENTER YOUR NAME:</label>
+          <input 
+            type="text" 
+            id="playerName" 
+            maxlength="12" 
+            placeholder="PLAYER"
+            autocomplete="off"
+          />
+          <button id="submitScore" class="submit-btn">SUBMIT</button>
+        </div>
+      </div>
+
+      <div id="highScoreDisplay">
+        <div class="high-score-board">
+          <div class="board-title">HIGH SCORE</div>
+          <div class="board-content">
+            <span id="highScoreHolder" class="holder-name">---</span>
+            <span id="highScoreValue" class="holder-score">0</span>
+          </div>
+        </div>
+      </div>
+
+      <p class="subtitle restart-prompt">Press SPACE or TAP to restart</p>
+    </div>
+
     <canvas id="gameCanvas"></canvas>
 
     <!-- Enhanced HUD -->
@@ -103,6 +146,7 @@
         <div id="score" class="hud-value">0</div>
         <div class="hud-label hud-small">HIGH</div>
         <div id="highScore" class="hud-value hud-small-value">0</div>
+        <div id="highScoreHolderName" class="hud-holder-name">---</div>
       </div>
 
       <div class="hud-panel hud-top-right">
