@@ -110,6 +110,7 @@ export class Game {
     this.gameOver = false;
     this.playerPowerUps.rapidFire.remaining = 0;
     this.playerPowerUps.tripleShot.remaining = 0;
+    this.input._restartGameCallback = null;
     this.reset();
     this.syncHUD();
   }
@@ -145,6 +146,7 @@ export class Game {
 
     if (this.lives <= 0) {
       this.gameOver = true;
+      this.input.onRestartGame(() => this.restart());
     } else {
       const centerX = this.canvas.width / 2;
       const centerY = this.canvas.height / 2;
@@ -198,10 +200,7 @@ export class Game {
 
   update(dt) {
     if (!this.gameStarted) return;
-    if (this.gameOver) {
-      if (this.input.isPressed(" ")) this.restart();
-      return;
-    }
+    if (this.gameOver) return;
 
     this.handleShooting(dt);
 

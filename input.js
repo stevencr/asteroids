@@ -4,10 +4,15 @@ export class InputManager {
   constructor() {
     this.keys = {};
     this._startGameCallback = null;
+    this._restartGameCallback = null;
   }
 
   onStartGame(callback) {
     this._startGameCallback = callback;
+  }
+
+  onRestartGame(callback) {
+    this._restartGameCallback = callback;
   }
 
   setup() {
@@ -15,6 +20,10 @@ export class InputManager {
     window.addEventListener("keydown", (e) => {
       if (e.key === " " && this._startGameCallback) {
         this._startGameCallback();
+        return;
+      }
+      if (e.key === " " && this._restartGameCallback) {
+        this._restartGameCallback();
         return;
       }
       this.keys[e.key] = true;

@@ -418,15 +418,15 @@ export class RenderSystem {
     ctx.strokeStyle = "#8cf";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(0, -18);       // Nose
-    ctx.lineTo(4, -6);        // Right shoulder
-    ctx.lineTo(12, 14);       // Right wingtip
-    ctx.lineTo(6, 11);        // Right inner wing
-    ctx.lineTo(4, 14);        // Right engine
-    ctx.lineTo(-4, 14);       // Left engine
-    ctx.lineTo(-6, 11);       // Left inner wing
-    ctx.lineTo(-12, 14);      // Left wingtip
-    ctx.lineTo(-4, -6);       // Left shoulder
+    ctx.moveTo(0, -18); // Nose
+    ctx.lineTo(4, -6); // Right shoulder
+    ctx.lineTo(12, 14); // Right wingtip
+    ctx.lineTo(6, 11); // Right inner wing
+    ctx.lineTo(4, 14); // Right engine
+    ctx.lineTo(-4, 14); // Left engine
+    ctx.lineTo(-6, 11); // Left inner wing
+    ctx.lineTo(-12, 14); // Left wingtip
+    ctx.lineTo(-4, -6); // Left shoulder
     ctx.closePath();
     ctx.fill();
     ctx.stroke();
