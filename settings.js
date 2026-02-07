@@ -89,7 +89,7 @@ export const settings = {
 
   // Collision radii
   collision: {
-    playerRadius: 12,
+    playerRadius: 14,
     asteroidSize3Radius: 40,
     asteroidSize2Radius: 25,
     asteroidSize1Radius: 15,

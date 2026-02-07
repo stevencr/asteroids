@@ -326,45 +326,159 @@ export class RenderSystem {
 
   renderPlayer(entity, pos) {
     const controller = entity.playerController;
+    const ctx = this.ctx;
+    const time = performance.now() / 1000;
 
-    this.ctx.save();
-    this.ctx.translate(pos.x, pos.y);
-    this.ctx.rotate(entity.rotation.angle);
+    ctx.save();
+    ctx.translate(pos.x, pos.y);
+    ctx.rotate(entity.rotation.angle);
 
-    // Draw shield if invulnerable
+    // Shield bubble (when invulnerable)
     if (controller && controller.invulnerable > 0) {
-      this.ctx.strokeStyle = "rgba(0, 255, 255, 0.6)";
-      this.ctx.fillStyle = "rgba(0, 255, 255, 0.1)";
-      this.ctx.lineWidth = 2;
-      this.ctx.beginPath();
-      this.ctx.arc(0, 0, 25, 0, Math.PI * 2);
-      this.ctx.fill();
-      this.ctx.stroke();
-      this.ctx.lineWidth = 1;
+      const shieldPulse = Math.sin(time * 4) * 0.15 + 0.85;
+      const shieldRadius = 26 * shieldPulse;
+
+      // Outer glow ring
+      ctx.strokeStyle = `rgba(0, 255, 255, ${0.2 + Math.sin(time * 6) * 0.1})`;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.arc(0, 0, shieldRadius + 3, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Main shield
+      ctx.strokeStyle = `rgba(0, 255, 255, ${0.5 + Math.sin(time * 3) * 0.2})`;
+      ctx.fillStyle = `rgba(0, 255, 255, ${0.05 + Math.sin(time * 5) * 0.03})`;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(0, 0, shieldRadius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Hexagonal facets on shield
+      ctx.strokeStyle = `rgba(0, 255, 255, ${0.15 + Math.sin(time * 2) * 0.05})`;
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + time * 0.5;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(Math.cos(a) * shieldRadius, Math.sin(a) * shieldRadius);
+        ctx.stroke();
+      }
+      ctx.lineWidth = 1;
     }
 
-    // Draw ship
-    this.ctx.strokeStyle = "white";
-    this.ctx.beginPath();
-    this.ctx.moveTo(0, -15);
-    this.ctx.lineTo(10, 15);
-    this.ctx.lineTo(0, 10);
-    this.ctx.lineTo(-10, 15);
-    this.ctx.closePath();
-    this.ctx.stroke();
-
-    // Draw thrust
+    // Engine thrust (drawn behind the ship)
     if (controller && controller.thrust) {
-      this.ctx.strokeStyle = "#f94";
-      this.ctx.beginPath();
-      this.ctx.moveTo(0, 12);
-      this.ctx.lineTo(5, 20);
-      this.ctx.lineTo(-5, 20);
-      this.ctx.closePath();
-      this.ctx.stroke();
+      const flicker = 0.7 + Math.random() * 0.3;
+      const thrustLen = (12 + Math.random() * 8) * flicker;
+
+      // Outer flame (orange-red)
+      ctx.fillStyle = `rgba(255, 100, 20, ${0.6 * flicker})`;
+      ctx.beginPath();
+      ctx.moveTo(-5, 13);
+      ctx.lineTo(0, 13 + thrustLen);
+      ctx.lineTo(5, 13);
+      ctx.closePath();
+      ctx.fill();
+
+      // Middle flame (yellow)
+      ctx.fillStyle = `rgba(255, 200, 50, ${0.7 * flicker})`;
+      ctx.beginPath();
+      ctx.moveTo(-3.5, 13);
+      ctx.lineTo(0, 13 + thrustLen * 0.7);
+      ctx.lineTo(3.5, 13);
+      ctx.closePath();
+      ctx.fill();
+
+      // Inner flame (white-hot core)
+      ctx.fillStyle = `rgba(255, 255, 220, ${0.9 * flicker})`;
+      ctx.beginPath();
+      ctx.moveTo(-1.5, 13);
+      ctx.lineTo(0, 13 + thrustLen * 0.4);
+      ctx.lineTo(1.5, 13);
+      ctx.closePath();
+      ctx.fill();
+
+      // Engine glow halo
+      ctx.shadowBlur = 15;
+      ctx.shadowColor = "rgba(255, 150, 50, 0.6)";
+      ctx.fillStyle = "rgba(255, 120, 30, 0.15)";
+      ctx.beginPath();
+      ctx.arc(0, 15, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
     }
 
-    this.ctx.restore();
+    // Ship hull glow
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = "rgba(0, 200, 255, 0.4)";
+
+    // Main hull (filled with dark interior)
+    ctx.fillStyle = "rgba(10, 20, 40, 0.9)";
+    ctx.strokeStyle = "#8cf";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(0, -18);       // Nose
+    ctx.lineTo(4, -6);        // Right shoulder
+    ctx.lineTo(12, 14);       // Right wingtip
+    ctx.lineTo(6, 11);        // Right inner wing
+    ctx.lineTo(4, 14);        // Right engine
+    ctx.lineTo(-4, 14);       // Left engine
+    ctx.lineTo(-6, 11);       // Left inner wing
+    ctx.lineTo(-12, 14);      // Left wingtip
+    ctx.lineTo(-4, -6);       // Left shoulder
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.shadowBlur = 0;
+
+    // Wing panel lines (structural detail)
+    ctx.strokeStyle = "rgba(100, 180, 255, 0.3)";
+    ctx.lineWidth = 1;
+    // Left wing line
+    ctx.beginPath();
+    ctx.moveTo(-3, -2);
+    ctx.lineTo(-9, 12);
+    ctx.stroke();
+    // Right wing line
+    ctx.beginPath();
+    ctx.moveTo(3, -2);
+    ctx.lineTo(9, 12);
+    ctx.stroke();
+
+    // Cockpit window
+    ctx.fillStyle = "rgba(0, 200, 255, 0.25)";
+    ctx.strokeStyle = "rgba(0, 200, 255, 0.6)";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(0, -14);
+    ctx.lineTo(2.5, -5);
+    ctx.lineTo(0, -2);
+    ctx.lineTo(-2.5, -5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Engine nozzle accents
+    ctx.fillStyle = "rgba(255, 150, 50, 0.5)";
+    ctx.fillRect(-4, 13, 2, 2);
+    ctx.fillRect(2, 13, 2, 2);
+
+    // Wingtip lights (blinking)
+    const blink = Math.sin(time * 8) > 0;
+    if (blink) {
+      ctx.fillStyle = "#f44";
+      ctx.beginPath();
+      ctx.arc(-12, 14, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = "#4f4";
+      ctx.beginPath();
+      ctx.arc(12, 14, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.restore();
   }
 
   renderAsteroid(entity, pos) {
@@ -425,18 +539,20 @@ export class RenderSystem {
   renderTrail(entity) {
     if (!entity.trail || entity.trail.points.length < 2) return;
 
-    this.ctx.strokeStyle = "rgba(255, 150, 50, 0.3)";
-    this.ctx.lineWidth = 2;
-    this.ctx.beginPath();
-
+    const ctx = this.ctx;
     const points = entity.trail.points;
-    this.ctx.moveTo(points[0].x, points[0].y);
+    const len = points.length;
 
-    for (let i = 1; i < points.length; i++) {
-      this.ctx.lineTo(points[i].x, points[i].y);
+    for (let i = 1; i < len; i++) {
+      const alpha = (i / len) * 0.4;
+      const width = (i / len) * 2.5;
+      ctx.strokeStyle = `rgba(80, 160, 255, ${alpha})`;
+      ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(points[i - 1].x, points[i - 1].y);
+      ctx.lineTo(points[i].x, points[i].y);
+      ctx.stroke();
     }
-
-    this.ctx.stroke();
   }
 
   renderPowerUp(entity, pos) {
