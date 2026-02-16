@@ -370,7 +370,7 @@ export class RenderSystem {
     // Engine thrust (drawn behind the ship)
     if (controller && controller.thrust) {
       const flicker = 0.7 + Math.random() * 0.3;
-      const thrustLen = (12 + Math.random() * 8) * flicker;
+      const thrustLen = (22 + Math.random() * 8) * flicker;
 
       // Outer flame (orange-red)
       ctx.fillStyle = `rgba(255, 100, 20, ${0.6 * flicker})`;
@@ -472,7 +472,7 @@ export class RenderSystem {
       ctx.beginPath();
       ctx.arc(-12, 14, 1.5, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = "#4f4";
+      ctx.fillStyle = "#f44";
       ctx.beginPath();
       ctx.arc(12, 14, 1.5, 0, Math.PI * 2);
       ctx.fill();

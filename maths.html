@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sin/Cos Animation</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        background: #1a1a2e;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-family: Arial, sans-serif;
+        color: #eee;
+      }
+      h1 {
+        margin-bottom: 10px;
+      }
+      canvas {
+        border: 2px solid #16213e;
+        background: #0f3460;
+        margin: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+      }
+      .info {
+        margin: 10px;
+        padding: 10px;
+        background: #16213e;
+        border-radius: 5px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Sin & Cos Movement Visualizations</h1>
+
+    <div class="info">
+      <strong>Circle:</strong> Shows circular motion using cos(angle) for X and
+      sin(angle) for Y
+    </div>
+    <canvas id="circleCanvas" width="600" height="400"></canvas>
+
+    <div class="info"><strong>Wave:</strong> Shows a moving sine wave</div>
+    <canvas id="waveCanvas" width="600" height="200"></canvas>
+
+    <script>
+      // Circle Animation
+      const circleCanvas = document.getElementById("circleCanvas");
+      const circleCtx = circleCanvas.getContext("2d");
+
+      let circleAngle = 0;
+      const centerX = circleCanvas.width / 2;
+      const centerY = circleCanvas.height / 2;
+      const radius = 120;
+
+      function drawCircle() {
+        circleCtx.fillStyle = "#0f3460";
+        circleCtx.fillRect(0, 0, circleCanvas.width, circleCanvas.height);
+
+        // Draw the circular path
+        circleCtx.beginPath();
+        circleCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+        circleCtx.strokeStyle = "#33415550";
+        circleCtx.lineWidth = 2;
+        circleCtx.stroke();
+
+        // Calculate position using sin/cos
+        const x = centerX + Math.cos(circleAngle) * radius;
+        const y = centerY + Math.sin(circleAngle) * radius;
+
+        // Draw line from center to moving point
+        circleCtx.beginPath();
+        circleCtx.moveTo(centerX, centerY);
+        circleCtx.lineTo(x, y);
+        circleCtx.strokeStyle = "#e94560";
+        circleCtx.lineWidth = 2;
+        circleCtx.stroke();
+
+        // Draw center point
+        circleCtx.beginPath();
+        circleCtx.arc(centerX, centerY, 5, 0, Math.PI * 2);
+        circleCtx.fillStyle = "#fff";
+        circleCtx.fill();
+
+        // Draw moving circle
+        circleCtx.beginPath();
+        circleCtx.arc(x, y, 15, 0, Math.PI * 2);
+        circleCtx.fillStyle = "#00d9ff";
+        circleCtx.fill();
+
+        // Draw angle indicator
+        circleCtx.beginPath();
+        circleCtx.arc(centerX, centerY, 40, 0, circleAngle);
+        circleCtx.strokeStyle = "#00d9ff80";
+        circleCtx.lineWidth = 3;
+        circleCtx.stroke();
+
+        // Display coordinates
+        circleCtx.fillStyle = "#fff";
+        circleCtx.font = "14px Arial";
+        circleCtx.fillText(
+          `x = cos(${circleAngle.toFixed(2)}) = ${Math.cos(circleAngle).toFixed(2)}`,
+          10,
+          20,
+        );
+        circleCtx.fillText(
+          `y = sin(${circleAngle.toFixed(2)}) = ${Math.sin(circleAngle).toFixed(2)}`,
+          10,
+          40,
+        );
+
+        circleAngle += 0.02;
+        requestAnimationFrame(drawCircle);
+      }
+
+      // Wave Animation
+      const waveCanvas = document.getElementById("waveCanvas");
+      const waveCtx = waveCanvas.getContext("2d");
+
+      let waveOffset = 0;
+      const amplitude = 60;
+      const frequency = 0.02;
+      const waveY = waveCanvas.height / 2;
+
+      function drawWave() {
+        waveCtx.fillStyle = "#0f3460";
+        waveCtx.fillRect(0, 0, waveCanvas.width, waveCanvas.height);
+
+        // Draw center line
+        waveCtx.beginPath();
+        waveCtx.moveTo(0, waveY);
+        waveCtx.lineTo(waveCanvas.width, waveY);
+        waveCtx.strokeStyle = "#33415550";
+        waveCtx.lineWidth = 1;
+        waveCtx.stroke();
+
+        // Draw the sine wave
+        waveCtx.beginPath();
+        waveCtx.moveTo(0, waveY);
+
+        for (let x = 0; x < waveCanvas.width; x++) {
+          const y = waveY + Math.sin(x * frequency + waveOffset) * amplitude;
+          waveCtx.lineTo(x, y);
+        }
+
+        waveCtx.strokeStyle = "#00d9ff";
+        waveCtx.lineWidth = 3;
+        waveCtx.stroke();
+
+        // Draw moving point on wave
+        const pointX = waveCanvas.width / 2;
+        const pointY =
+          waveY + Math.sin(pointX * frequency + waveOffset) * amplitude;
+
+        waveCtx.beginPath();
+        waveCtx.arc(pointX, pointY, 8, 0, Math.PI * 2);
+        waveCtx.fillStyle = "#e94560";
+        waveCtx.fill();
+
+        // Draw vertical line at moving point
+        waveCtx.beginPath();
+        waveCtx.moveTo(pointX, waveY);
+        waveCtx.lineTo(pointX, pointY);
+        waveCtx.strokeStyle = "#e9456080";
+        waveCtx.lineWidth = 2;
+        waveCtx.stroke();
+
+        // Display wave equation
+        waveCtx.fillStyle = "#fff";
+        waveCtx.font = "14px Arial";
+        waveCtx.fillText(
+          `y = ${amplitude} * sin(x * ${frequency} + ${waveOffset.toFixed(2)})`,
+          10,
+          20,
+        );
+
+        waveOffset += 0.05;
+        requestAnimationFrame(drawWave);
+      }
+
+      // Start animations
+      drawCircle();
+      drawWave();
+    </script>
+  </body>
+</html>
