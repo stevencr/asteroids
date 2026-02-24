@@ -85,10 +85,7 @@ export class EntitySpawner {
 
     this.entities.push(createBullet(bulletX, bulletY, velX, velY));
 
-    if (
-      playerPowerUps.tripleShot &&
-      playerPowerUps.tripleShot.remaining > 0
-    ) {
+    if (playerPowerUps.tripleShot && playerPowerUps.tripleShot.remaining > 0) {
       const spread = settings.weapons.tripleShotSpread;
 
       const leftAngle = angle - spread;
@@ -105,10 +102,7 @@ export class EntitySpawner {
       );
 
       const rightAngle = angle + spread;
-      const rightDir = new Vector(
-        Math.sin(rightAngle),
-        -Math.cos(rightAngle),
-      );
+      const rightDir = new Vector(Math.sin(rightAngle), -Math.cos(rightAngle));
       const rightX = player.position.value.x + rightDir.x * 20;
       const rightY = player.position.value.y + rightDir.y * 20;
       this.entities.push(

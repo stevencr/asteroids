@@ -171,6 +171,7 @@ export class Game {
       player.position.value.x,
       player.position.value.y,
       settings.effects.playerDeathParticles,
+      "red",
     );
     this.shake = settings.effects.screenShakeDuration;
 

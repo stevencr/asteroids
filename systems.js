@@ -503,27 +503,70 @@ export class RenderSystem {
   }
 
   renderBullet(pos) {
-    this.ctx.fillStyle = "white";
+    const radius = 5; // base bullet size
+
+    // --- Create radial gradient ---
+    const gradient = this.ctx.createRadialGradient(
+      pos.x,
+      pos.y,
+      0, // inner circle (center)
+      pos.x,
+      pos.y,
+      radius, // outer circle
+    );
+
+    // Center bright, edges fade out
+    gradient.addColorStop(0, "rgba(255, 255, 255, 1)"); // bright white center
+    gradient.addColorStop(1, "rgba(255, 255, 255, 0)"); // transparent edge
+
+    // --- Draw bullet ---
+    this.ctx.fillStyle = gradient;
     this.ctx.beginPath();
-    this.ctx.arc(pos.x, pos.y, 2, 0, Math.PI * 2);
+    this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
     this.ctx.fill();
   }
 
   renderParticle(entity, pos) {
-    if (!entity.lifetime) return;
+    if (!entity.lifetime || entity.lifetime.remaining === undefined) return;
 
+    // --- Fade based on remaining lifetime ---
     const alpha = entity.lifetime.remaining / entity.lifetime.initial;
+
+    // --- Determine base color ---
     const color = entity.renderable.data.color || "white";
+    let innerRGB = "255, 255, 255"; // default white
+    let outerRGB = "255, 255, 255";
 
-    // Color mapping for different particle types
-    let rgb = "255, 255, 255";
-    if (color === "orange") rgb = "255, 150, 50";
-    else if (color === "cyan") rgb = "0, 255, 255";
-    else if (color === "red") rgb = "255, 50, 50";
+    if (color === "orange") {
+      innerRGB = "255, 200, 50";
+      outerRGB = "255, 100, 0";
+    } else if (color === "red") {
+      innerRGB = "255, 100, 100";
+      outerRGB = "200, 0, 0";
+    } else if (color === "cyan") {
+      innerRGB = "0, 255, 255";
+      outerRGB = "0, 150, 255";
+    }
 
-    this.ctx.fillStyle = `rgba(${rgb}, ${alpha})`;
+    // --- Fixed radius, scaled by alpha for fading/shrinking effect ---
+    const radius = 10 * alpha; // 3 is the base radius
+
+    // --- Create radial gradient ---
+    const gradient = this.ctx.createRadialGradient(
+      pos.x,
+      pos.y,
+      0,
+      pos.x,
+      pos.y,
+      radius,
+    );
+    gradient.addColorStop(0, `rgba(${innerRGB}, ${alpha})`); // center bright
+    gradient.addColorStop(1, `rgba(${outerRGB}, 0)`); // edges transparent
+
+    // --- Draw particle ---
+    this.ctx.fillStyle = gradient;
     this.ctx.beginPath();
-    this.ctx.arc(pos.x, pos.y, 1, 0, Math.PI * 2);
+    this.ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
     this.ctx.fill();
   }
 
@@ -543,15 +586,35 @@ export class RenderSystem {
     const points = entity.trail.points;
     const len = points.length;
 
-    for (let i = 1; i < len; i++) {
-      const alpha = (i / len) * 0.4;
-      const width = (i / len) * 2.5;
-      ctx.strokeStyle = `rgba(80, 160, 255, ${alpha})`;
+    ctx.beginPath();
+
+    for (let i = 0; i < len - 1; i++) {
+      const p0 = points[i];
+      const p1 = points[i + 1];
+
+      // Compute midpoint for quadratic curve
+      const midX = (p0.x + p1.x) / 2;
+      const midY = (p0.y + p1.y) / 2;
+
+      // Alpha and width taper along the trail
+      const alpha = ((i + 1) / len) * 0.4;
+      const width = ((i + 1) / len) * 2.5;
+
       ctx.lineWidth = width;
-      ctx.beginPath();
-      ctx.moveTo(points[i - 1].x, points[i - 1].y);
-      ctx.lineTo(points[i].x, points[i].y);
+
+      // Optional: gradient along segment
+      const grad = ctx.createLinearGradient(p0.x, p0.y, p1.x, p1.y);
+      grad.addColorStop(0, `rgba(80,160,255,0)`);
+      grad.addColorStop(0.5, `rgba(80,160,255,${alpha})`);
+      grad.addColorStop(1, `rgba(80,160,255,0)`);
+      ctx.strokeStyle = grad;
+
+      // Draw quadratic curve
+      if (i === 0) ctx.moveTo(p0.x, p0.y); // move to first point
+      ctx.quadraticCurveTo(p0.x, p0.y, midX, midY);
       ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(midX, midY); // start next segment from midpoint
     }
   }
 
