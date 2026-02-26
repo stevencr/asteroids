@@ -200,16 +200,16 @@ export class UFOSystem {
       }
     }
   }
-}
+} 
 
-// System: Power-up animation
+// System: Power-up animation  
 export class PowerUpSystem {
   update(entities, dt) {
     for (const entity of entities) {
       if (!entity.powerUp) continue;
 
       // Animate pulsing effect
-      entity.powerUp.pulsePhase += dt * 3;
+      entity.powerUp.pulsePhase += dt * 3;  
     }
   }
 }
